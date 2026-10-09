@@ -1,0 +1,108 @@
+declare lower;
+declare once_per_bar;
+
+input length = 50;
+input sigLength = 9;
+
+def alpha = 2.0 / (length + 1);
+
+def C = close;
+def O = open;
+
+# Recursive exponential envelopes
+rec up1 =
+    if IsNaN(up1[1]) then C
+    else Max(Max(C, O), up1[1] - (up1[1] - C) * alpha);
+
+rec up2 =
+    if IsNaN(up2[1]) then C * C
+    else Max(Max(C * C, O * O),
+         up2[1] - (up2[1] - C * C) * alpha);
+
+rec dn1 =
+    if IsNaN(dn1[1]) then C
+    else Min(Min(C, O),
+         dn1[1] + (C - dn1[1]) * alpha);
+
+rec dn2 =
+    if IsNaN(dn2[1]) then C * C
+    else Min(Min(C * C, O * O),
+         dn2[1] + (C * C - dn2[1]) * alpha);
+
+# Components
+#def bullRaw = dn2 - dn1 * dn1;
+#def bearRaw = up2 - up1 * up1;
+
+#def bull = if bullRaw > 0 then Sqrt(bullRaw) else 0;
+#def bear = if bearRaw > 0 then Sqrt(bearRaw) else 0;
+def bull = Sqrt(dn2 - dn1 * dn1);
+def bear = Sqrt(up2 - up1 * up1);
+#bull.SetDefaultColor(Color.GREEN);
+#bull.SetLineWeight(2);
+#bear.SetDefaultColor(Color.RED);
+#bear.SetLineWeight(2);
+
+# Signal
+plot osc = bull - bear;
+osc.SetPaintingStrategy(PaintingStrategy.HISTOGRAM);
+osc.SetLineWeight(3);
+
+plot signal = ExpAverage(osc, sigLength);
+osc.AssignValueColor(if osc > 0 and osc > signal then Color.CYAN else if osc > 0 and osc < signal then Color.BLUE else if osc < 0 and osc < signal then Color.RED else Color.ORANGE);
+signal.AssignValueColor(if signal > signal[1] then Color.GREEN else Color.RED);
+signal.SetLineWeight(2);
+
+# Optional zero line
+plot zeroLine = 0;
+zeroLine.SetDefaultColor(Color.GRAY);
+zeroLine.SetStyle(Curve.SHORT_DASH);
+
+def EMA200 = ExpAverage(close, 200);
+AddLabel(yes, "EMA200", if EMA200 > EMA200[1] then Color.GREEN else Color.RED);
+
+def Time950 = SecondsFromTime(950) == 0;
+AddVerticalLine(Time950, "Very High", Color.WHITE, Curve.SHORT_DASH);
+def Time1020 = SecondsFromTime(1020) == 0;
+AddVerticalLine(Time1020, "High Moderate", Color.WHITE, Curve.SHORT_DASH);
+def Time1345 = SecondsFromTime(1330) == 0;
+AddVerticalLine(Time1345, "Moderate", Color.WHITE, Curve.SHORT_DASH);
+def Time1450 = SecondsFromTime(1450) == 0;
+AddVerticalLine(Time1450, "Very High", Color.WHITE, Curve.SHORT_DASH);
+
+# Squeeze
+def sqzLength = 20;
+def lowDev = 1.0;
+def midDev = 1.5;
+def highDev = 2.0;
+#def avgPrice = (open + close) / 2;
+
+# Bolinger Bands
+def bbDev = StDev(close, sqzLength);
+def midLine = Average(close, sqzLength);
+def upperBand = midLine + highDev * bbDev;
+
+# Keltner Channels
+def ATR = Average(TrueRange(high, close, low), sqzLength);
+def highShift = highDev * ATR;
+def midShift = midDev * ATR;
+def lowShift = lowDev * ATR;
+def highChannel = midLine + highShift;
+def midChannel = midLine + midShift;
+def lowChannel = midLine + lowShift;
+
+plot sqzRed = if upperBand < midChannel and upperBand > lowChannel then zeroLine else Double.NaN;
+sqzRed.SetPaintingStrategy(PaintingStrategy.POINTS);
+sqzRed.AssignValueColor(Color.RED);
+sqzRed.SetLineWeight(3);
+plot sqzBlack = if upperBand < highChannel and upperBand > midChannel then zeroLIne else Double.NaN;
+sqzBlack.SetPaintingStrategy(PaintingStrategy.POINTS);
+sqzBlack.AssignValueColor(Color.BLACK);
+sqzBlack.SetLineWeight(3);
+plot sqzOrange = if upperBand < lowChannel then zeroLine else Double.NaN;
+sqzOrange.SetPaintingStrategy(PaintingStrategy.POINTS);
+sqzOrange.AssignValueColor(Color.ORANGE);
+sqzOrange.SetLineWeight(3);
+#plot sqzGreen = if upperBand > highChannel then 0 else Double.NaN;
+#sqzGreen.SetPaintingStrategy(PaintingStrategy.POINTS);
+#sqzGreen.AssignValueColor(Color.GREEN);
+#sqzGreen.SetLineWeight(3);
