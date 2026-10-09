@@ -1,0 +1,89 @@
+declare once_per_bar;
+ 
+#input OpExDay = {Monday, Tuesday, Wednesday, Thursday, default Friday};
+
+#def OpExDayOfWeek;
+#switch (OpExDay) {
+#    case Monday:
+#        OpExDayOfWeek = 1;
+#    case Tuesday:
+#        OpExDayOfWeek = 2;
+#    case Wednesday:
+#        OpExDayOfWeek = 3;
+#    case Thursday:
+#        OpExDayOfWeek = 4;
+#    case Friday:
+#        OpExDayOfWeek = 5;
+#};
+
+#def dow = GetDayOfWeek(GetYYYYMMDD());
+#def nextMonth = if GetMonth() == 12 then 1 else GetMonth() + 1;
+#def nextYear = if GetMonth() == 12 then GetYear() + 1 else GetYear();
+#def firstDayNextMonth = nextYear * 10000 + nextMonth * 100 + 1;
+#def daysToNextMonth = DaysTillDate(firstDayNextMonth);
+#def daysToExp = if dow <= OpExDayOfWeek then OpExDayOfWeek - dow else OpExDayOfWeek;
+#def expirationDate = if daysToExp < daysToNextMonth then GetYYYYMMDD() + daysToExp else firstDayNextMonth + daysToExp - daysToNextMonth;
+
+input OpEx = 20261009;
+def expirationDate = if OpEx > GetYYYYMMDD() then OpEx else GetYYYYMMDD();
+def expDate = expirationDate - 20000000;
+#def dte = DaysTillDate(expirationDate);
+
+def strikeInterval = if GetSymbol() == "SPY" or GetSymbol() == "QQQ" or GetSymbol() == "IWM" then 1 else 2.5;
+
+def S = close(GetUnderlyingSymbol(), period="DAY"); 
+#def S = close(GetSymbol()); # Intraday
+
+# =============================
+# 🔹 BUILD STRIKES
+# =============================
+# At-The-Money Strike
+def atmStrike = Round(S / strikeInterval, 0) * strikeInterval;
+
+def K0 = atmStrike;
+def K1 = atmStrike + strikeInterval;
+def K2 = atmStrike + 2 * strikeInterval;
+def K3 = atmStrike + 3 * strikeInterval;
+def K4 = atmStrike + 4 * strikeInterval;
+def K5 = atmStrike + 5 * strikeInterval;
+
+def K_1 = atmStrike - strikeInterval;
+def K_2 = atmStrike - 2 * strikeInterval;
+def K_3 = atmStrike - 3 * strikeInterval;
+def K_4 = atmStrike - 4 * strikeInterval;
+def K_5 = atmStrike - 5 * strikeInterval;
+
+def callOI0 = open_interest("."+getSymbol()+AsPrice(expDate)+"C"+AsPrice(K0),AggregationPeriod.DAY);
+def callOI1 = open_interest("."+getSymbol()+AsPrice(expDate)+"C"+AsPrice(K1),AggregationPeriod.DAY);
+def callOI2 = open_interest("."+getSymbol()+AsPrice(expDate)+"C"+AsPrice(K2),AggregationPeriod.DAY);
+def callOI3 = open_interest("."+getSymbol()+AsPrice(expDate)+"C"+AsPrice(K3),AggregationPeriod.DAY);
+def callOI4 = open_interest("."+getSymbol()+AsPrice(expDate)+"C"+AsPrice(K4),AggregationPeriod.DAY);
+def callOI5 = open_interest("."+getSymbol()+AsPrice(expDate)+"C"+AsPrice(K5),AggregationPeriod.DAY);
+
+def putOI_5 = open_interest("."+getSymbol()+AsPrice(expDate)+"P"+AsPrice(K_5),AggregationPeriod.DAY);
+def putOI_4 = open_interest("."+getSymbol()+AsPrice(expDate)+"P"+AsPrice(K_4),AggregationPeriod.DAY);
+def putOI_3 = open_interest("."+getSymbol()+AsPrice(expDate)+"P"+AsPrice(K_3),AggregationPeriod.DAY);
+def putOI_2 = open_interest("."+getSymbol()+AsPrice(expDate)+"P"+AsPrice(K_2),AggregationPeriod.DAY);
+def putOI_1 = open_interest("."+getSymbol()+AsPrice(expDate)+"P"+AsPrice(K_1),AggregationPeriod.DAY);
+def putOI0 = open_interest("."+getSymbol()+AsPrice(expDate)+"P"+AsPrice(K0),AggregationPeriod.DAY);
+
+def highestBar = HighestAll(BarNumber());
+def isHighestBar = BarNumber() == highestBar;
+def shift = 5;
+
+AddChartBubble(isHighestBar, K_5, Round(putOI_5[shift], 0), Color.UPTICK, no);
+AddChartBubble(isHighestBar, K_4, Round(putOI_4[shift], 0), Color.UPTICK, no);
+AddChartBubble(isHighestBar, K_3, Round(putOI_3[shift], 0), Color.UPTICK, no);
+AddChartBubble(isHighestBar, K_2, Round(putOI_2[shift], 0), Color.UPTICK, no);
+AddChartBubble(isHighestBar, K_1, Round(putOI_1[shift], 0), Color.UPTICK, no);
+AddChartBubble(isHighestBar, K0, Round(putOI0[shift], 0), Color.UPTICK, no);
+#AddChartBubble(isHighestBar, K0, if K0 > S then Round(callOI0[shift], 0) else Round(putOI0[shift], 0), if K0 > S then Color.DOWNTICK else Color.UPTICK);
+AddChartBubble(isHighestBar, K0, Round(callOI0[shift], 0), Color.DOWNTICK);
+AddChartBubble(isHighestBar, K1, Round(callOI1[shift], 0), Color.DOWNTICK);
+AddChartBubble(isHighestBar, K2, Round(callOI2[shift], 0), Color.DOWNTICK);
+AddChartBubble(isHighestBar, K3, Round(callOI3[shift], 0), Color.DOWNTICK);
+AddChartBubble(isHighestBar, K4, Round(callOI4[shift], 0), Color.DOWNTICK);
+AddChartBubble(isHighestBar, K5, Round(callOI5[shift], 0), Color.DOWNTICK);
+
+AddLabel(yes, "."+getSymbol()+AsPrice(expDate)+"C"+AsPrice(K1) + ":"+ close("."+getSymbol()+AsPrice(expDate + 1)+"C"+AsPrice(K1)), Color.ORANGE);
+AddLabel(yes, "."+getSymbol()+AsPrice(expDate)+"P"+AsPrice(K_1) + ":"+ close("."+getSymbol()+AsPrice(expDate + 1)+"P"+AsPrice(K_1)), Color.ORANGE);
