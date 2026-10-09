@@ -1,0 +1,95 @@
+# PRC_HalfTrend | indicator
+# 10.03.2017
+# Ported by Mobius Apr 2020
+# Arrows added by @shortyuk (https://usethinkscript.com/threads/half-trend-scalper-indicator-for-thinkorswim.3305/post-30413)
+
+input Amplitude = 2;
+
+def lowpricei;
+def highpricei;
+def lowma;
+def highma;
+def nexttrend;
+def maxlowprice;
+def trend;
+def minhighprice;
+def up;
+def dn;
+
+plot halftrend;
+
+lowpricei = Lowest(low, Amplitude);
+highpricei = Highest(high, Amplitude);
+lowma = average(low, Amplitude);
+highma = average(high, Amplitude);
+if BarNumber() > Amplitude and nexttrend[1] == 1
+    {
+     maxlowprice = Max(lowpricei, maxlowprice[1]);
+     trend = if highma < maxlowprice[1] and close < low[1] then 1 else trend[1];
+     nexttrend = if highma < maxlowprice[1] and close < low[1] then 0 else nexttrend[1];
+     minhighprice = if highma < maxlowprice[1] and close < low[1] then highpricei else minhighprice[1];
+    }
+else if nexttrend[1] == 0
+    {
+     minhighprice = Min(highpricei, minhighprice[1]);
+     trend = if lowma > minhighprice[1] and close > high[1] then 0 else trend[1];
+     nexttrend = if lowma > minhighprice[1] and close > high[1] then 1 else nexttrend[1];
+     maxlowprice = if lowma > minhighprice[1] and close > high[1] then lowpricei else maxlowprice[1];
+    }
+else
+    {
+     maxlowprice = maxlowprice[1];
+     trend = trend[1];
+     nexttrend = nexttrend[1];
+     minhighprice = minhighprice[1];
+    }
+if trend == 0
+    {
+     up = if trend[1] <> 0
+          then dn[1]
+          else Max(maxlowprice[1], up[1]);
+     dn = 0;
+    }
+else if trend[1] <> 1
+    {
+     dn = up[1];
+     up = 0;
+    }
+else if trend == 1
+    {
+     dn = Min(minhighprice, dn[1]);
+     up = up[1];
+    }
+else
+    {
+     up =up[1];
+     dn = dn[1];
+    }
+if up > 0
+    {
+     halftrend = if close > 0 then up else Double.NaN;
+    }
+else
+    {
+     halftrend = if close > 0 then dn else Double.NaN;
+    }
+halftrend.SetStyle(Curve.Firm);
+halftrend.AssignValueColor(if up > 0 then Color.GREEN else Color.RED);
+halftrend.SetLineWeight(2);
+
+#def lowBar = if low == low(period = "DAY") then BarNumber() else lowBar[1];
+#def highBar = if high == high(period = "DAY") then BarNumber() else highBar[1];
+
+#AddLabel(yes, if halftrend == up then "Up" else "Dn", if halftrend == up then Color.GREEN else Color.RED);
+
+plot upSig = if up > 0 and up[1] <= 0 then halftrend else Double.NaN;
+plot dnSig = if dn > 0 and dn[1] <= 0 then halftrend else Double.NaN;
+
+upSig.SetDefaultColor(Color.CYAN);
+upSig.SetPaintingStrategy(PaintingStrategy.BOOLEAN_WEDGE_DOWN);
+upSig.SetLineWeight(2);
+dnSig.SetDefaultColor(Color.YELLOW);
+dnSig.SetPaintingStrategy(PaintingStrategy.BOOLEAN_WEDGE_UP);
+dnSig.SetLineWeight(2);
+
+Alert(upSig or dnSig, if upSig then "Bullish!" else "Bearish!", Alert.BAR, Sound.RING);
