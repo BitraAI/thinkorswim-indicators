@@ -1,0 +1,23 @@
+def dailyHigh = high(period="DAY");
+def dailyLow = low(period="DAY");
+def highBar = if high == dailyHigh then BarNumber() else Double.NaN;
+def lowBar = if low == dailyLow then BarNumber() else Double.NaN;
+AddChartBubble(highBar, high, Round(dailyHigh, 2), Color.LIGHT_RED);
+AddChartBubble(lowBar, low, Round(dailyLow, 2), Color.LIGHT_GREEN, no);
+
+plot EMA20 = ExpAverage(close, 20);
+EMA20.AssignValueColor(if EMA20 > EMA20[1] then Color.GREEN else Color.RED);
+EMA20.SetLineWeight(2);
+
+plot EMA50 = ExpAverage(close, 50);
+EMA50.AssignValueColor(if EMA50 > EMA50[1] then Color.GREEN else Color.RED);
+EMA50.SetLineWeight(2);
+EMA50.SetStyle(Curve.LONG_DASH);
+
+plot EMA200 = ExpAverage(close, 200);
+EMA200.AssignValueColor(if EMA200 > EMA200[1] then Color.GREEN else Color.RED);
+EMA200.SetLineWeight(3);
+
+def lrcLength = 38;
+plot InertiaLine = inertiaall(close, lrcLength);
+InertiaLine.SetDefaultColor(Color.LIME);
