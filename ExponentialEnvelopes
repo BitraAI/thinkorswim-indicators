@@ -1,0 +1,30 @@
+input length = 50;
+input sigLength = 9;
+
+def alpha = 2.0 / (length + 1);
+
+def C = close;
+def O = open;
+
+# Recursive exponential envelopes
+rec up1 =
+    if IsNaN(up1[1]) then C
+    else Max(Max(C, O), up1[1] - (up1[1] - C) * alpha);
+rec up2 =
+    if IsNaN(up2[1]) then C * C
+    else Max(Max(C * C, O * O), up2[1] - (up2[1] - C * C) * alpha);
+rec dn1 =
+    if IsNaN(dn1[1]) then C
+    else Min(Min(C, O), dn1[1] + (C - dn1[1]) * alpha);
+rec dn2 =
+    if IsNaN(dn2[1]) then C * C
+    else Min(Min(C * C, O * O), dn2[1] + (C * C - dn2[1]) * alpha);
+
+# Components
+def bull = Sqrt(dn2 - dn1 * dn1);
+def bear = Sqrt(up2 - up1 * up1);
+
+plot up = dn1 + bull;
+up.AssignValueColor(if up > up[1] then Color.GREEN else GetColor(0));
+plot dn = up1 - bear;
+dn.AssignValueColor(if dn > dn[1] then GetColor(1) else Color.RED);
