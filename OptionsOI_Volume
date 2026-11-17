@@ -28,12 +28,12 @@
 #def daysToExp = if dow <= OpExDayOfWeek then OpExDayOfWeek - dow else OpExDayOfWeek;
 #def expirationDate = if daysToExp < daysToNextMonth then GetYYYYMMDD() + daysToExp else firstDayNextMonth + daysToExp - daysToNextMonth;
 
-input OpEx = 20261112;
+input OpEx = 20261117;
 def expirationDate = if OpEx > GetYYYYMMDD() then OpEx else GetYYYYMMDD();
 def expDate = expirationDate - 20000000;
 def dte = DaysTillDate(expirationDate);
 
-def strikeInterval = if GetSymbol() == "SPY" or GetSymbol() == "QQQ" or GetSymbol() == "IWM" or GetSymbol() == "PLTR" then 1 else 2.5;
+def strikeInterval = if GetSymbol() == "SPY" or GetSymbol() == "QQQ" or GetSymbol() == "IWM" or GetSymbol() == "SPCX" then 1 else 2.5;
 
 def S = close(GetSymbol(), period = "DAY"); 
 
@@ -66,118 +66,64 @@ def K_8 = atmStrike - 8 * strikeInterval;
 def K_9 = atmStrike - 9 * strikeInterval;
 def K_10 = atmStrike - 10 * strikeInterval;
 
-def callOI0 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K0), AggregationPeriod.DAY);
-def callOI1 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K1), AggregationPeriod.DAY);
-def callOI2 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K2), AggregationPeriod.DAY);
-def callOI3 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K3), AggregationPeriod.DAY);
-def callOI4 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K4), AggregationPeriod.DAY);
-def callOI5 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K5), AggregationPeriod.DAY);
-def callOI6 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K6), AggregationPeriod.DAY);
-def callOI7 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K7), AggregationPeriod.DAY);
-def callOI8 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K8), AggregationPeriod.DAY);
-def callOI9 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K9), AggregationPeriod.DAY);
-def callOI10 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K10), AggregationPeriod.DAY);
+def call0 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K0), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K0), AggregationPeriod.DAY) * 0.70;
+def call1 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K1), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K1), AggregationPeriod.DAY) * 0.70;
+def call2 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K2), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K2), AggregationPeriod.DAY) * 0.70;
+def call3 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K3), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K3), AggregationPeriod.DAY) * 0.70;
+def call4 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K4), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K4), AggregationPeriod.DAY) * 0.70;
+def call5 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K5), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K5), AggregationPeriod.DAY) * 0.70;
+def call6 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K6), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K6), AggregationPeriod.DAY) * 0.70;
+def call7 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K7), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K7), AggregationPeriod.DAY) * 0.70;
+def call8 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K8), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K8), AggregationPeriod.DAY) * 0.70;
+def call9 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K9), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K9), AggregationPeriod.DAY) * 0.70;
+def call10 = open_interest("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K10), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K10), AggregationPeriod.DAY) * 0.70;
 
-def putOI0 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K0), AggregationPeriod.DAY);
-def putOI_1 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_1), AggregationPeriod.DAY);
-def putOI_2 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_2), AggregationPeriod.DAY);
-def putOI_3 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_3), AggregationPeriod.DAY);
-def putOI_4 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_4), AggregationPeriod.DAY);
-def putOI_5 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_5), AggregationPeriod.DAY);
-def putOI_6 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_6), AggregationPeriod.DAY);
-def putOI_7 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_7), AggregationPeriod.DAY);
-def putOI_8 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_8), AggregationPeriod.DAY);
-def putOI_9 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_9), AggregationPeriod.DAY);
-def putOI_10 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_10), AggregationPeriod.DAY);
+def put0 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K0), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K0), AggregationPeriod.DAY) * 0.70;
+def put_1 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_1), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_1), AggregationPeriod.DAY) * 0.70;
+def put_2 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_2), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_2), AggregationPeriod.DAY) * 0.70;
+def put_3 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_3), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_3), AggregationPeriod.DAY) * 0.70;
+def put_4 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_4), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_4), AggregationPeriod.DAY) * 0.70;
+def put_5 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_5), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_5), AggregationPeriod.DAY) * 0.70;
+def put_6 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_6), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_6), AggregationPeriod.DAY) * 0.70;
+def put_7 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_7), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_7), AggregationPeriod.DAY) * 0.70;
+def put_8 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_8), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_8), AggregationPeriod.DAY) * 0.70;
+def put_9 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_9), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_9), AggregationPeriod.DAY) * 0.70;
+def put_10 = open_interest("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_10), AggregationPeriod.DAY) * 0.30 + volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_10), AggregationPeriod.DAY) * 0.70;
 
-def callWallOI =
-    Max(if K0 > S then callOI0 else 0,
-    Max(callOI1,
-    Max(callOI2,
-    Max(callOI3,
-    Max(callOI4,
-    Max(callOI5,
-    Max(callOI6,
-    Max(callOI7,
-    Max(callOI8,
-    Max(callOI9, callOI10))))))))));
+def callWall =
+    Max(if K0 > S then call0 else 0,
+    Max(call1,
+    Max(call2,
+    Max(call3,
+    Max(call4,
+    Max(call5,
+    Max(call6,
+    Max(call7,
+    Max(call8,
+    Max(call9, call10))))))))));
 
-def putWallOI =
-    Max(if K0 < S then putOI0 else 0,
-    Max(putOI_1,
-    Max(putOI_2,
-    Max(putOI_3,
-    Max(putOI_4,
-    Max(putOI_5,
-    Max(putOI_6,
-    Max(putOI_7,
-    Max(putOI_8,
-    Max(putOI_9, putOI_10))))))))));
+def putWall =
+    Max(if K0 < S then put0 else 0,
+    Max(put_1,
+    Max(put_2,
+    Max(put_3,
+    Max(put_4,
+    Max(put_5,
+    Max(put_6,
+    Max(put_7,
+    Max(put_8,
+    Max(put_9, put_10))))))))));
 
 # Calculate Highest OI Call Strike
-def callWallOIStrike = if callOI0 == callWallOI then K0 else if callOI1 == callWallOI then K1 else if callOI2 == callWallOI then K2 else if callOI3 == callWallOI then K3 else if callOI4 == callWallOI then K4 else if callOI5 == callWallOI then K5 else if callOI6 == callWallOI then K6 else if callOI7 == callWallOI then K7 else if  callOI8 == callWallOI then K8 else if callOI9 == callWallOI then K9 else if callOI10 == callWallOI then K10 else Double.NaN;
+def callWallStrike = if call0 == callWall then K0 else if call1 == callWall then K1 else if call2 == callWall then K2 else if call3 == callWall then K3 else if call4 == callWall then K4 else if call5 == callWall then K5 else if call6 == callWall then K6 else if call7 == callWall then K7 else if  call8 == callWall then K8 else if call9 == callWall then K9 else if call10 == callWall then K10 else Double.NaN;
 
 # Calculate Highest OI Put Strike
-def putWallOIStrike = if putOI0 == putWallOI then K0 else if putOI_1 == putWallOI then K_1 else if putOI_2 == putWallOI then K_2 else if putOI_3 == putWallOI then K_3 else if putOI_4 == putWallOI then K_4 else if putOI_5 == putWallOI then K_5 else if putOI_6 == putWallOI then K_6 else if putOI_7 == putWallOI then K_7 else if putOI_8 == putWallOI then K_8 else if putOI_9 == putWallOI then K_9 else if putOI_10 == putWallOI then K_10 else Double.NaN;
+def putWallStrike = if put0 == putWall then K0 else if put_1 == putWall then K_1 else if put_2 == putWall then K_2 else if put_3 == putWall then K_3 else if put_4 == putWall then K_4 else if put_5 == putWall then K_5 else if put_6 == putWall then K_6 else if put_7 == putWall then K_7 else if put_8 == putWall then K_8 else if put_9 == putWall then K_9 else if put_10 == putWall then K_10 else Double.NaN;
 
 def highestBar = BarNumber() == HighestAll(BarNumber());
 
-AddChartBubble(highestBar, putWallOIStrike, putWallOI, GetColor(1), no);
-AddChartBubble(highestBar, callWallOIStrike, callWallOI, GetColor(0), yes);
+AddChartBubble(highestBar, putWallStrike, Round(putWall, 0), Color.UPTICK, no);
+AddChartBubble(highestBar, callWallStrike, Round(callWall, 0), Color.DOWNTICK, yes);
 
-def callVol0 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K0), AggregationPeriod.DAY);
-def callVol1 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K1), AggregationPeriod.DAY);
-def callVol2 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K2), AggregationPeriod.DAY);
-def callVol3 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K3), AggregationPeriod.DAY);
-def callVol4 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K4), AggregationPeriod.DAY);
-def callVol5 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K5), AggregationPeriod.DAY);
-def callVol6 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K6), AggregationPeriod.DAY);
-def callVol7 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K7), AggregationPeriod.DAY);
-def callVol8 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K8), AggregationPeriod.DAY);
-def callVol9 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K9), AggregationPeriod.DAY);
-def callVol10 = volume("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K10), AggregationPeriod.DAY);
-
-def putVol0 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K0), AggregationPeriod.DAY);
-def putVol_1 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_1), AggregationPeriod.DAY);
-def putVol_2 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_2), AggregationPeriod.DAY);
-def putVol_3 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_3), AggregationPeriod.DAY);
-def putVol_4 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_4), AggregationPeriod.DAY);
-def putVol_5 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_5), AggregationPeriod.DAY);
-def putVol_6 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_6), AggregationPeriod.DAY);
-def putVol_7 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_7), AggregationPeriod.DAY);
-def putVol_8 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_8), AggregationPeriod.DAY);
-def putVol_9 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_9), AggregationPeriod.DAY);
-def putVol_10 = volume("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_10), AggregationPeriod.DAY);
-
-def callWallVol =
-    Max(if K0 > S then callVol0 else 0,
-    Max(callVol1,
-    Max(callVol2,
-    Max(callVol3,
-    Max(callVol4,
-    Max(callVol5,
-    Max(callVol6,
-    Max(callVol7,
-    Max(callVol8,
-    Max(callVol9, callVol10))))))))));
-
-def putWallVol =
-    Max(if K0 < S then putVol0 else 0,
-    Max(putVol_1,
-    Max(putVol_2,
-    Max(putVol_3,
-    Max(putVol_4,
-    Max(putVol_5,
-    Max(putVol_6,
-    Max(putVol_7,
-    Max(putVol_8,
-    Max(putVol_9, putVol_10))))))))));
-
-# Calculate Highest OI Call Strike
-def callWallVolStrike = if callVol0 == callWallVol then K0 else if callVol1 == callWallVol then K1 else if callVol2 == callWallVol then K2 else if callVol3 == callWallVol then K3 else if callVol4 == callWallVol then K4 else if callVol5 == callWallVol then K5 else if callVol6 == callWallVol then K6 else if callVol7 == callWallVol then K7 else if  callVol8 == callWallVol then K8 else if callVol9 == callWallVol then K9 else if callVol10 == callWallVol then K10 else Double.NaN;
-
-# Calculate Highest OI Put Strike
-def putWallVolStrike = if putVol0 == putWallVol then K0 else if putVol_1 == putWallVol then K_1 else if putVol_2 == putWallVol then K_2 else if putVol_3 == putWallVol then K_3 else if putVol_4 == putWallVol then K_4 else if putVol_5 == putWallVol then K_5 else if putVol_6 == putWallVol then K_6 else if putVol_7 == putWallVol then K_7 else if putVol_8 == putWallVol then K_8 else if putVol_9 == putWallVol then K_9 else if putVol_10 == putWallVol then K_10 else Double.NaN;
-
-AddChartBubble(highestBar, putWallVolStrike, putWallVol, Color.UPTICK, no);
-AddChartBubble(highestBar, callWallVolStrike, callWallVol, Color.DOWNTICK, yes);
+#AddLabel(yes, GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K1) + ": " + close("." + GetSymbol() + AsPrice(expDate) + "C" + AsPrice(K1)), Color.WHITE);
+#AddLabel(yes, GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_1) + ": " + close("." + GetSymbol() + AsPrice(expDate) + "P" + AsPrice(K_1)), Color.WHITE);
